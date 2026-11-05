@@ -1,0 +1,68 @@
+[workspace]
+resolver = "3"
+members = ["crates/*"]
+default-members = ["crates/*"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.96"
+license = "MIT"
+repository = "https://github.com/pingdotgg/t3code"
+authors = ["T3 Code Rust contributors"]
+publish = false
+
+[workspace.dependencies]
+t3-protocol = { path = "crates/t3-protocol" }
+t3-contracts = { path = "crates/t3-contracts" }
+t3-state = { path = "crates/t3-state" }
+t3-client = { path = "crates/t3-client" }
+t3-backend = { path = "crates/t3-backend" }
+
+anyhow = "1.0.104"
+async-channel = "2.5.0"
+chrono = { version = "0.4.45", default-features = false, features = ["std", "clock", "serde"] }
+clap = { version = "4.6.7", features = ["derive", "env"] }
+dirs = "7.0.0"
+futures = "0.3.34"
+gpui = { version = "0.2.2", features = ["runtime_shaders"] }
+hex = "0.4.3"
+hmac = "0.13.0"
+pretty_assertions = "1.4.1"
+proptest = "1.12.0"
+pulldown-cmark = { version = "0.13.6", default-features = false }
+rand = "0.10.3"
+reqwest = { version = "0.13.5", default-features = false, features = ["json", "form", "rustls"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = { version = "1.0.154", features = ["preserve_order"] }
+sha2 = "0.11.1"
+tempfile = "3.27.0"
+thiserror = "2.0.21"
+tokio = { version = "1.54.1", features = ["rt-multi-thread", "macros", "net", "time", "sync", "process", "io-util", "fs", "signal"] }
+tokio-tungstenite = { version = "0.30.0", features = ["rustls-tls-webpki-roots"] }
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter", "fmt"] }
+unicode-segmentation = "1.13.3"
+url = "2.5.8"
+uuid = { version = "1.29.0", features = ["v4"] }
+wiremock = "0.6.5"
+
+[workspace.lints.rust]
+unsafe_code = "deny"
+missing_debug_implementations = "warn"
+rust_2018_idioms = { level = "warn", priority = -1 }
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+dbg_macro = "warn"
+todo = "warn"
+unwrap_used = "warn"
+expect_used = "warn"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = "symbols"
+
+[profile.dev.package."*"]
+opt-level = 1

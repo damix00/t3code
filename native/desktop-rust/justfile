@@ -1,0 +1,39 @@
+# Run `just` to list recipes.
+
+default:
+    @just --list
+
+# Run the app against an installed `t3` (or `npx t3`).
+run *args:
+    cargo run -p t3-desktop -- {{args}}
+
+# Format the workspace.
+fmt:
+    cargo fmt --all
+
+# Everything CI checks, in order of speed.
+ci: lint test deny docs
+
+lint:
+    cargo fmt --all --check
+    cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
+
+test:
+    cargo test --workspace --all-features --locked
+
+deny:
+    cargo deny check
+
+docs:
+    RUSTDOCFLAGS="-D warnings" cargo doc --workspace --no-deps --all-features --locked
+
+# Line coverage report (needs cargo-llvm-cov).
+coverage:
+    cargo llvm-cov --workspace --all-features --html
+    @echo "open target/llvm-cov/html/index.html"
+
+# Build `T3 Code.app` and a .dmg into dist/ (macOS).
+bundle-macos:
+    cargo build --release --locked -p t3-desktop
+    mkdir -p dist
+    ./scripts/bundle-macos.sh target/release/t3-desktop dist

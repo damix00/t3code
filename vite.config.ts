@@ -161,6 +161,8 @@ export default defineConfig({
       "infra/task-cache/vendor/**",
       // Macroscope requires one glob per line; Markdown formatting corrupts it.
       ".macroscope/ignore.md",
+      // The native Rust client keeps its own Markdown and fixture style.
+      "native/desktop-rust/**",
       ".alchemy",
       "dist",
       "dist-electron",
@@ -193,6 +195,7 @@ export default defineConfig({
     ignorePatterns: [
       ".repos",
       ".repos/**",
+      "native/desktop-rust/**",
       "infra/task-cache/vendor/**",
       "dist",
       "dist-electron",

@@ -1,0 +1,33 @@
+[package]
+name = "t3-client"
+description = "Pairing, authorization and the WebSocket RPC client for T3 Code servers"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+futures.workspace = true
+rand.workspace = true
+reqwest.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+t3-contracts.workspace = true
+t3-protocol.workspace = true
+t3-state.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tokio-tungstenite.workspace = true
+tracing.workspace = true
+url.workspace = true
+
+[dev-dependencies]
+pretty_assertions.workspace = true
+proptest.workspace = true
+t3-contracts = { workspace = true, features = ["fixtures"] }
+wiremock.workspace = true
+
+[lints]
+workspace = true

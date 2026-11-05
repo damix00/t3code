@@ -1,0 +1,85 @@
+name: Desktop (Rust)
+
+on:
+  pull_request:
+    paths:
+      - native/desktop-rust/**
+      - .github/workflows/desktop-rust.yml
+  push:
+    branches: [main]
+    paths:
+      - native/desktop-rust/**
+      - .github/workflows/desktop-rust.yml
+  workflow_dispatch:
+
+concurrency:
+  group: desktop-rust-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: 0
+  RUST_BACKTRACE: short
+
+defaults:
+  run:
+    working-directory: native/desktop-rust
+
+jobs:
+  fmt:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: rustup show active-toolchain || rustup toolchain install
+      - run: cargo fmt --all --check
+
+  check:
+    name: Clippy and tests (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - if: runner.os == 'Linux'
+        run: ./scripts/install-linux-deps.sh
+      # The supervisor tests run a fake server on Node; without it they skip.
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - run: rustup show active-toolchain || rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: native/desktop-rust
+      - run: cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
+      - run: cargo test --workspace --all-features --locked --no-fail-fast
+
+  docs:
+    name: Docs
+    runs-on: ubuntu-latest
+    env:
+      RUSTDOCFLAGS: -D warnings
+    steps:
+      - uses: actions/checkout@v6
+      - run: ./scripts/install-linux-deps.sh
+      - run: rustup show active-toolchain || rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: native/desktop-rust
+      - run: cargo doc --workspace --no-deps --all-features --locked
+
+  deny:
+    name: Licenses and advisories
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          manifest-path: native/desktop-rust/Cargo.toml
+          command: check
+          arguments: --all-features
